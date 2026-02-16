@@ -138,133 +138,135 @@ def genero_labels(sexo: str):
 
 
 # ========= Catálogo de GIROS / RUBROS según Ordenanza =========
+# ========= Catálogo de GIROS / RUBROS según Ordenanza =========
 GIROS_RUBROS = [
     # Rubro 1
     {
         "label": "Rubro 1.a - Golosinas y afines (CÓDIGO G 001)",
-        "giro": "Golosinas y afines, debidamente envasados con registro sanitario y con fecha de vencimiento vigente.",
+        "giro": "GOLOSINAS Y AFINES, DEBIDAMENTE ENVASADOS CON REGISTRO SANITARIO Y CON FECHA DE VENCIMIENTO VIGENTE.",
         "rubro": "1",
         "codigo": "001",
     },
     # Rubro 2
     {
         "label": "Rubro 2.a - Venta de frutas o verduras (CÓDIGO G 002)",
-        "giro": "Venta de frutas o verduras.",
+        "giro": "VENTA DE FRUTAS O VERDURAS.",
         "rubro": "2",
         "codigo": "002",
     },
     {
         "label": "Rubro 2.b - Productos naturales con registro sanitario (CÓDIGO G 003)",
-        "giro": "Venta de productos naturales, con registro sanitario.",
+        "giro": "VENTA DE PRODUCTOS NATURALES, CON REGISTRO SANITARIO.",
         "rubro": "2",
         "codigo": "003",
     },
     # Rubro 3
     {
         "label": "Rubro 3.a - Bebidas saludables (CÓDIGO G 004)",
-        "giro": "Bebidas saludables: emoliente, quinua, maca, soya.",
+        "giro": "BEBIDAS SALUDABLES: EMOLIENTE, QUINUA, MACA, SOYA.",
         "rubro": "3",
         "codigo": "004",
     },
     {
         "label": "Rubro 3.b - Potajes tradicionales (CÓDIGO G 005)",
-        "giro": "Potajes tradicionales.",
+        "giro": "POTAJES TRADICIONALES.",
         "rubro": "3",
         "codigo": "005",
     },
     {
         "label": "Rubro 3.c - Dulces tradicionales (CÓDIGO G 006)",
-        "giro": "Dulces tradicionales.",
+        "giro": "DULCES TRADICIONALES.",
         "rubro": "3",
         "codigo": "006",
     },
     {
         "label": "Rubro 3.d - Sándwiches (CÓDIGO G 007)",
-        "giro": "Sándwiches.",
+        "giro": "SÁNDWICHES.",
         "rubro": "3",
         "codigo": "007",
     },
     {
         "label": "Rubro 3.e - Jugo de naranja y similares (CÓDIGO G 008)",
-        "giro": "Jugo de naranja y similares.",
+        "giro": "JUGO DE NARANJA Y SIMILARES.",
         "rubro": "3",
         "codigo": "008",
     },
     {
         "label": "Rubro 3.f - Canchitas, confitería y similares (CÓDIGO G 009)",
-        "giro": "Canchitas, confitería y similares.",
+        "giro": "CANCHITAS, CONFITERÍA Y SIMILARES.",
         "rubro": "3",
         "codigo": "009",
     },
     # Rubro 4
     {
         "label": "Rubro 4.a - Mercería, bazar y útiles de escritorio (CÓDIGO G 010)",
-        "giro": "Mercerías, artículos de bazar y útiles de escritorio.",
+        "giro": "MERCERÍAS, ARTÍCULOS DE BAZAR Y ÚTILES DE ESCRITORIO.",
         "rubro": "4",
         "codigo": "010",
     },
     {
         "label": "Rubro 4.b - Diarios, revistas, libros y loterías (CÓDIGO G 011)",
-        "giro": "Diarios y revistas, libros y loterías.",
+        "giro": "DIARIOS Y REVISTAS, LIBROS Y LOTERÍAS.",
         "rubro": "4",
         "codigo": "011",
     },
     {
         "label": "Rubro 4.c - Monedas y estampillas (CÓDIGO G 012)",
-        "giro": "Monedas y estampillas.",
+        "giro": "MONEDAS Y ESTAMPILLAS.",
         "rubro": "4",
         "codigo": "012",
     },
     {
         "label": "Rubro 4.d - Artesanías (CÓDIGO G 013)",
-        "giro": "Artesanías.",
+        "giro": "ARTESANÍAS.",
         "rubro": "4",
         "codigo": "013",
     },
     {
         "label": "Rubro 4.e - Artículos religiosos (CÓDIGO G 014)",
-        "giro": "Artículos religiosos.",
+        "giro": "ARTÍCULOS RELIGIOSOS.",
         "rubro": "4",
         "codigo": "014",
     },
     {
         "label": "Rubro 4.f - Artículos de limpieza (CÓDIGO G 015)",
-        "giro": "Artículos de limpieza.",
+        "giro": "ARTÍCULOS DE LIMPIEZA.",
         "rubro": "4",
         "codigo": "015",
     },
     {
         "label": "Rubro 4.g - Pilas y relojes (CÓDIGO G 016)",
-        "giro": "Pilas y relojes.",
+        "giro": "PILAS Y RELOJES.",
         "rubro": "4",
         "codigo": "016",
     },
     # Rubro 5
     {
         "label": "Rubro 5.a - Duplicado de llaves / Cerrajería (CÓDIGO G 017)",
-        "giro": "Duplicado de llaves y cerrajería.",
+        "giro": "DUPLICADO DE LLAVES Y CERRAJERÍA.",
         "rubro": "5",
         "codigo": "017",
     },
     {
         "label": "Rubro 5.b - Lustradores de calzado (CÓDIGO G 018)",
-        "giro": "Lustradores de calzado.",
+        "giro": "LUSTRADORES DE CALZADO.",
         "rubro": "5",
         "codigo": "018",
     },
     {
         "label": "Rubro 5.c - Artistas plásticos y retratistas (CÓDIGO G 019)",
-        "giro": "Artistas plásticos y retratistas.",
+        "giro": "ARTISTAS PLÁSTICOS Y RETRATISTAS.",
         "rubro": "5",
         "codigo": "019",
     },
     {
         "label": "Rubro 5.d - Fotografías (CÓDIGO G 020)",
-        "giro": "Fotografías.",
+        "giro": "FOTOGRAFÍAS.",
         "rubro": "5",
         "codigo": "020",
     },
 ]
+
 
 GIROS_OPCIONES = [item["label"] for item in GIROS_RUBROS]
 
