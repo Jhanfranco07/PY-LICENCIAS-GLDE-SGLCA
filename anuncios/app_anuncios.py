@@ -36,6 +36,7 @@ SCOPES = [
 COLUMNAS_OFICIALES = [
     "EXP",
     "N° RECIBO",
+    "FECHA DE INGRESO",  # ⬅️ nueva columna para el expediente
     "RUC DE LA EMPRESA",
     "NÚMERO DE AUTORIZACION ",
     "FECHA DE EMISIÓN DE LA AUTORIZACION",
@@ -199,6 +200,13 @@ def guardar_certificado_en_bd(
     # FECHA DE EXPIRACIÓN = texto de {{vigencia}}
     fecha_expiracion_str = vigencia_txt
 
+    # Fecha de ingreso del expediente (viene del contexto de evaluación)
+    fecha_ingreso_val = eval_ctx.get("fecha_ingreso", "")
+    if hasattr(fecha_ingreso_val, "strftime"):
+        fecha_ingreso_str = fecha_ingreso_val.strftime("%d/%m/%Y")
+    else:
+        fecha_ingreso_str = str(fecha_ingreso_val or "").strip()
+
     # Campos comunes desde la evaluación
     num_ds_val = str(eval_ctx.get("num_ds", "")).strip()
     ruc_empresa = str(eval_ctx.get("ruc", "")).strip()
@@ -217,6 +225,7 @@ def guardar_certificado_en_bd(
     nueva_fila = {
         "EXP": num_ds_val,
         "N° RECIBO": num_recibo,
+        "FECHA DE INGRESO": fecha_ingreso_str,  # ⬅️ ahora se guarda en la BD
         "RUC DE LA EMPRESA": ruc_empresa,
         "NÚMERO DE AUTORIZACION ": n_certificado,
         "FECHA DE EMISIÓN DE LA AUTORIZACION": fecha_emision_str,
@@ -281,7 +290,6 @@ def _extract_razon_social(res: dict) -> str:
         or (data.get("nombre") or "").strip()
         or (data.get("full_name") or "").strip()
     )
-
 
 
 def _cb_autocomplete_ruc():
