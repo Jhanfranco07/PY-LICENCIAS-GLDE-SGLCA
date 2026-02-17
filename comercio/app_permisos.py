@@ -105,6 +105,50 @@ def _parse_fecha_ddmmaaaa(val):
         return None
 
 
+def _coordenadas_validas(val: str) -> bool:
+    """
+    Valida formato: "lat,lon" o "lat, lon" con rangos:
+    lat [-90, 90], lon [-180, 180].
+    """
+    raw = (val or "").strip()
+    if not raw or "," not in raw:
+        return False
+    lat_txt, lon_txt = [p.strip() for p in raw.split(",", 1)]
+    try:
+        lat = float(lat_txt)
+        lon = float(lon_txt)
+    except Exception:
+        return False
+    return -90 <= lat <= 90 and -180 <= lon <= 180
+
+
+def _doc_identidad_valido(val: str) -> bool:
+    """
+    Acepta:
+    - DNI: 8 dígitos
+    - CE:  9 dígitos
+    """
+    doc = (val or "").strip()
+    return doc.isdigit() and len(doc) in (8, 9)
+
+
+def _label_plazo(tiempo: int, unidad: str) -> str:
+    """
+    Devuelve el plazo en mayúsculas y con singular/plural correcto:
+    - 1 + meses -> MES
+    - n + meses -> MESES
+    - 1 + años  -> AÑO
+    - n + años  -> AÑOS
+    """
+    u = (unidad or "").strip().lower()
+    t = int(tiempo or 0)
+    if u == "meses":
+        return "MES" if t == 1 else "MESES"
+    if u == "años":
+        return "AÑO" if t == 1 else "AÑOS"
+    return (unidad or "").strip().upper()
+
+
 def render_doc(context: dict, filename_stem: str, plantilla_path: str):
     if not os.path.exists(plantilla_path):
         st.error(f"No se encontró la plantilla: {plantilla_path}")
@@ -308,6 +352,11 @@ def _cb_autocomplete_dni():
     if not dni_val:
         return
 
+    # Solo consultamos RENIEC para DNI de 8 dígitos.
+    # Si es CE (9 dígitos), no consultamos CODART.
+    if not (dni_val.isdigit() and len(dni_val) == 8):
+        return
+
     try:
         res = consultar_dni(dni_val)
         nombre = dni_a_nombre_completo(res)
@@ -407,6 +456,7 @@ def run_permisos_comercio():
             st.session_state["ubicacion"] = to_upper(
                 fila.get("UBICACIÓN A SOLICITAR", "")
             )
+            st.session_state["coordenadas"] = ""
             st.session_state["telefono"] = str(
                 fila.get("N° DE CELULAR", "")
             ).strip()
@@ -458,13 +508,18 @@ def run_permisos_comercio():
     # ----- 1.2 Formulario de Evaluación -----
 
     dni = st.text_input(
-        "DNI* (8 dígitos)",
+        "DNI / CE* (8 o 9 dígitos)",
         key="dni",
         value=st.session_state.get("dni", ""),
-        max_chars=8,
-        placeholder="########",
+        max_chars=9,
+        placeholder="#########",
         on_change=_cb_autocomplete_dni,
     )
+    dni_clean = (dni or "").strip()
+    if dni_clean.isdigit() and len(dni_clean) == 8:
+        st.caption("Tipo detectado: DNI")
+    elif dni_clean.isdigit() and len(dni_clean) == 9:
+        st.caption("Tipo detectado: CE")
 
     msg_dni = (st.session_state.get("dni_lookup_msg") or "").strip()
     if msg_dni:
@@ -493,8 +548,8 @@ def run_permisos_comercio():
         placeholder="Ej: 121, 132, 142...",
     )
 
-    if dni and (not dni.isdigit() or len(dni) != 8):
-        st.error("⚠️ DNI debe tener exactamente 8 dígitos numéricos")
+    if dni and (not _doc_identidad_valido(dni)):
+        st.error("⚠️ El documento debe tener 8 (DNI) o 9 (CE) dígitos numéricos")
 
     ds = text_input_upper(
         "Documento Simple (DS)",
@@ -555,6 +610,12 @@ def run_permisos_comercio():
         value=st.session_state.get("ubicacion", ""),
         placeholder="Av./Jr./Parque..., sin 'Distrito de Pachacámac'",
     )
+    coordenadas = st.text_input(
+        "Coordenadas* (lat, lon)",
+        key="coordenadas",
+        value=st.session_state.get("coordenadas", ""),
+        placeholder="Ej.: -12.158784, -76.887945",
+    ).strip()
     referencia = text_input_upper(
         "Referencia (opcional)",
         key="referencia",
@@ -605,6 +666,7 @@ def run_permisos_comercio():
             "domicilio": domicilio,
             "giro": giro_texto,
             "ubicacion": ubicacion,
+            "coordenadas": coordenadas,
         }
         for k, v in req.items():
             if not isinstance(v, str) or not v.strip():
@@ -613,8 +675,12 @@ def run_permisos_comercio():
             falt.append("fecha_ingreso")
         if not fecha_evaluacion:
             falt.append("fecha_evaluacion")
-        if dni and (not dni.isdigit() or len(dni) != 8):
-            st.error("DNI inválido")
+        if dni and (not _doc_identidad_valido(dni)):
+            st.error("Documento inválido: usa 8 (DNI) o 9 (CE) dígitos")
+        elif not _coordenadas_validas(coordenadas):
+            st.error(
+                "Coordenadas inválidas. Usa el formato: lat, lon (ej.: -12.158784, -76.887945)."
+            )
         elif falt:
             st.error("Faltan campos: " + ", ".join(falt))
         else:
@@ -630,10 +696,11 @@ def run_permisos_comercio():
                 "fecha_evaluacion": fmt_fecha_larga(fecha_evaluacion),
                 "giro": giro_texto,
                 "ubicacion": ubicacion.strip(),
+                "coordenadas": coordenadas,
                 "referencia": to_upper(referencia),
                 "horario": horario_eval.strip(),
                 "tiempo": int(tiempo_num),
-                "plazo": plazo_unidad,
+                "plazo": _label_plazo(int(tiempo_num), plazo_unidad),
                 "rubro": rubro_num,
                 "codigo_rubro": codigo_rubro,
                 "telefono": telefono.strip(),
@@ -744,6 +811,7 @@ def run_permisos_comercio():
                 "DNI": eva.get("dni", ""),
                 "Domicilio": eva.get("domicilio", "") + "-PACHACAMAC",
                 "Ubicación": eva.get("ubicacion", ""),
+                "Coordenadas": eva.get("coordenadas", ""),
                 "Giro": eva.get("giro", ""),
                 "Rubro": eva.get("rubro", ""),
                 "Código de rubro": eva.get("codigo_rubro", ""),
@@ -775,7 +843,7 @@ def run_permisos_comercio():
             eva["dni"] = st.text_input(
                 "DNI (override opcional)",
                 value=eva.get("dni", ""),
-                max_chars=8,
+                max_chars=9,
             )
             eva["domicilio"] = to_upper(
                 st.text_input(
@@ -787,6 +855,11 @@ def run_permisos_comercio():
                     "Ubicación (override opcional)", value=eva.get("ubicacion", "")
                 )
             )
+            eva["coordenadas"] = st.text_input(
+                "Coordenadas (override opcional)",
+                value=eva.get("coordenadas", ""),
+                placeholder="Ej.: -12.158784, -76.887945",
+            ).strip()
             eva["giro"] = to_upper(
                 st.text_input(
                     "Giro (override opcional)", value=eva.get("giro", "")
@@ -822,9 +895,9 @@ def run_permisos_comercio():
                     falt.append(k)
 
             if eva.get("dni") and (
-                not str(eva["dni"]).isdigit() or len(str(eva["dni"])) != 8
+                not _doc_identidad_valido(str(eva["dni"]))
             ):
-                st.error("DNI inválido (8 dígitos)")
+                st.error("Documento inválido (DNI 8 o CE 9 dígitos)")
             elif not eva.get("horario"):
                 st.error(
                     "Falta **Horario** en Evaluación (o en Ediciones rápidas)."
@@ -1027,6 +1100,7 @@ def run_permisos_comercio():
                         fecha_emitida_cert=fmt_fecha_corta(fecha_cert_val),
                         vigencia_autorizacion=vigencia_txt,
                         lugar_venta=eva.get("ubicacion", ""),
+                        coordenadas=eva.get("coordenadas", ""),
                         referencia=eva.get("referencia", ""),
                         giro=eva.get("giro", ""),
                         horario=eva.get("horario", ""),

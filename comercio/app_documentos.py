@@ -22,6 +22,16 @@ def _fmt_fecha_corta(d) -> str:
         return ""
 
 
+def _doc_identidad_valido(val: str) -> bool:
+    """
+    Acepta:
+    - DNI: 8 dígitos
+    - CE:  9 dígitos
+    """
+    doc = (val or "").strip()
+    return doc.isdigit() and len(doc) in (8, 9)
+
+
 # ===== Autocomplete DNI solo para este módulo DS =====
 def _init_dni_state_ds():
     st.session_state.setdefault("dni_ds_msg", "")
@@ -32,6 +42,11 @@ def _cb_autocomplete_dni_ds():
     st.session_state["dni_ds_msg"] = ""
 
     if not dni_val:
+        return
+
+    # Solo consulta RENIEC para DNI de 8 dígitos.
+    # Si es CE (9 dígitos), no consulta CODART.
+    if not (dni_val.isdigit() and len(dni_val) == 8):
         return
 
     try:
@@ -126,12 +141,17 @@ def run_documentos_comercio():
     c3, c4 = st.columns([2, 3])
     with c3:
         dni = st.text_input(
-            "DNI (8 dígitos)*",
+            "DNI / CE (8 o 9 dígitos)*",
             key="dni_ds",
-            max_chars=8,
-            placeholder="########",
+            max_chars=9,
+            placeholder="#########",
             on_change=_cb_autocomplete_dni_ds,
         )
+    dni_clean = (dni or "").strip()
+    if dni_clean.isdigit() and len(dni_clean) == 8:
+        st.caption("Tipo detectado: DNI")
+    elif dni_clean.isdigit() and len(dni_clean) == 9:
+        st.caption("Tipo detectado: CE")
     with c4:
         nombre = st.text_input(
             "Nombre y apellido*",
@@ -251,8 +271,8 @@ def run_documentos_comercio():
         if not ubicacion.strip():
             falt.append("ubicacion")
 
-        if dni and (not dni.isdigit() or len(dni) != 8):
-            st.error("DNI inválido: debe tener exactamente 8 dígitos.")
+        if dni and (not _doc_identidad_valido(dni)):
+            st.error("Documento inválido: debe tener 8 (DNI) o 9 (CE) dígitos.")
         elif falt:
             st.error("Faltan campos obligatorios: " + ", ".join(falt))
         else:
