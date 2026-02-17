@@ -691,8 +691,8 @@ def run_permisos_comercio():
                 "dni": dni.strip(),
                 "ds": (ds or "").strip(),
                 "domicilio": to_upper(domicilio),
-                # fecha de ingreso en largo: 16 de enero de 2026
-                "fecha_ingreso": fmt_fecha_larga_de(fecha_ingreso),
+                # En evaluación va en formato corto (DD/MM/YYYY)
+                "fecha_ingreso": fmt_fecha_corta(fecha_ingreso),
                 "fecha_evaluacion": fmt_fecha_larga(fecha_evaluacion),
                 "giro": giro_texto,
                 "ubicacion": ubicacion.strip(),
