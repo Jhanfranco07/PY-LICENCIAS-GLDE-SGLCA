@@ -14,7 +14,7 @@ from google.oauth2.service_account import Credentials
 from utils import fecha_larga, safe_filename_pretty  # función común en utils.py
 
 #  CODART (SUNAT) para autocompletar
-from integraciones.codart import CodartAPIError, consultar_ruc
+from integraciones.codart import CodartAPIError, consultar_dni, consultar_ruc
 
 
 # ============================================================================
@@ -61,6 +61,7 @@ COLUMNAS_OFICIALES = [
     "COLOR",
     "MATERIAL",
     "N° CARAS",
+    "COORDENADAS",
 ]
 
 
@@ -221,6 +222,7 @@ def guardar_certificado_en_bd(
     color = eval_ctx.get("colores", "")
     material = eval_ctx.get("material", "")
     num_caras = eval_ctx.get("num_cara", "")
+    coordenadas = str(eval_ctx.get("coordenadas", "")).strip()
 
     nueva_fila = {
         "EXP": num_ds_val,
@@ -250,6 +252,7 @@ def guardar_certificado_en_bd(
         "COLOR": color,
         "MATERIAL": material,
         "N° CARAS": num_caras,
+        "COORDENADAS": coordenadas,
     }
 
     # Leemos la BD actual, concatenamos y reescribimos todo
@@ -272,6 +275,7 @@ def _init_anuncios_state():
     st.session_state.setdefault("ruc_sol", "")
     st.session_state.setdefault("representante_sol", "")
     st.session_state.setdefault("direccion_sol", "")
+    st.session_state.setdefault("coordenadas_sol", "")
     st.session_state.setdefault("anuncio_lookup_msg", "")
 
 
@@ -441,6 +445,12 @@ def run_modulo_anuncios():
             max_chars=200,
             key="direccion_sol",
         )
+        coordenadas = st.text_input(
+            "Coordenadas (lat, lon)",
+            max_chars=80,
+            key="coordenadas_sol",
+            placeholder="Ej.: -12.158784, -76.887945",
+        )
 
     with col2:
         ruc = st.text_input(
@@ -562,6 +572,7 @@ def run_modulo_anuncios():
         nombre = (st.session_state.get("nombre_sol") or "").strip()
         ruc = (st.session_state.get("ruc_sol") or "").strip()
         direccion = (st.session_state.get("direccion_sol") or "").strip()
+        coordenadas = (st.session_state.get("coordenadas_sol") or "").strip()
         representante = (st.session_state.get("representante_sol") or "").strip() if es_ruc20 else ""
 
         if not nombre or not n_anuncio or not num_ds:
@@ -575,6 +586,7 @@ def run_modulo_anuncios():
                 "nombre": nombre,
                 "ruc": ruc,
                 "direccion": direccion,
+                "coordenadas": coordenadas,
                 "largo": f"{largo:.2f}",
                 "alto": f"{alto:.2f}",
                 "leyenda": leyenda,
@@ -648,6 +660,7 @@ def run_modulo_anuncios():
                     "Tipo de RUC": eval_ctx.get("tipo_ruc_label"),
                     "Representante (si RUC 20)": eval_ctx.get("representante"),
                     "Dirección": eval_ctx.get("direccion"),
+                    "Coordenadas": eval_ctx.get("coordenadas"),
                     "Ubicación": eval_ctx.get("ubicacion"),
                     "Leyenda": eval_ctx.get("leyenda"),
                     "Dimensiones": f"{eval_ctx.get('largo')} x {eval_ctx.get('alto')}",
@@ -712,7 +725,7 @@ def run_modulo_anuncios():
             with col_doc2:
                 doc_num = st.text_input(
                     "N° documento del solicitante",
-                    max_chars=20,
+                    max_chars=9,
                     key="doc_num",
                 )
             with col_rec:
@@ -742,6 +755,26 @@ def run_modulo_anuncios():
         if not n_certificado:
             st.error("Completa el N° de certificado.")
         else:
+            doc_tipo_norm = (doc_tipo or "").strip().upper()
+            doc_num_clean = (doc_num or "").strip()
+            if doc_num_clean:
+                if doc_tipo_norm == "DNI":
+                    if not (doc_num_clean.isdigit() and len(doc_num_clean) == 8):
+                        st.error("DNI inválido: debe tener 8 dígitos.")
+                        return
+                    try:
+                        consultar_dni(doc_num_clean)
+                    except (ValueError, CodartAPIError) as e:
+                        st.error(f"DNI inválido o no consultable en CODART: {e}")
+                        return
+                    except Exception as e:
+                        st.error(f"Error validando DNI con CODART: {e}")
+                        return
+                else:
+                    if not (doc_num_clean.isdigit() and len(doc_num_clean) == 9):
+                        st.error("C.E inválido: debe tener 9 dígitos.")
+                        return
+
             if vigencia_tipo == "TEMPORAL":
                 vigencia_txt = f"TEMPORAL ({int(meses_vigencia)}) MESES"
             else:
