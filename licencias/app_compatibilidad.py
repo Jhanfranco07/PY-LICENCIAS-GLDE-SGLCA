@@ -219,24 +219,7 @@ def run_modulo_compatibilidad():
         st.session_state["_flash_kind"] = ""
         st.session_state["_flash_text"] = ""
 
-    # ---------- Control de Nº de giros (fuera del form) ----------
     st.markdown('<div class="card">', unsafe_allow_html=True)
-
-    st.markdown(
-        '<div class="section-title">Detalle de giros de la tabla</div>',
-        unsafe_allow_html=True,
-    )
-    st.caption("Puedes registrar varios giros en la tabla de compatibilidad.")
-    n_giros_tabla = st.number_input(
-        "N° de giros en la tabla",
-        min_value=1,
-        max_value=10,
-        step=1,
-        key="n_giros_tabla",
-    )
-    n_giros_tabla = int(n_giros_tabla)
-
-    st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
     # ---------- Formulario principal ----------
     with st.form("form_compatibilidad"):
@@ -335,65 +318,100 @@ def run_modulo_compatibilidad():
 
         st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
-        # ---------------- Actividad general + zonificación ----------------
+        # ---------------- Actividades generales + zonificación ----------------
         st.markdown(
             '<div class="section-title">Actividad general y zonificación</div>',
             unsafe_allow_html=True,
         )
 
-        col_act1, col_act2 = st.columns([3, 1])
-        with col_act1:
-            actividad = st.text_input("Actividad general*", max_chars=200)
-        with col_act2:
-            codigo = st.text_input("Código de la actividad*", max_chars=50)
-
-        zona_opciones = [f"{c} – {d}" for c, d in ZONAS]
-        zona_sel = st.selectbox("Zonificación (código)*", zona_opciones)
-        zona_codigo = zona_sel.split(" – ")[0]
-        zona_desc = ZONAS_DICT.get(zona_codigo, "")
-
-        st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
-
-        # ---------------- Giros de la tabla ----------------
-        st.markdown(
-            '<div class="section-title">Giros de la tabla de compatibilidad</div>',
-            unsafe_allow_html=True,
+        n_actividades = st.number_input(
+            "N° de actividades generales*",
+            min_value=1,
+            max_value=5,
+            step=1,
+            key="n_actividades_compa",
         )
+        n_actividades = int(n_actividades)
+        zona_opciones = [f"{c} – {d}" for c, d in ZONAS]
 
-        actividades_tabla = []
-        for i in range(n_giros_tabla):
-            st.markdown(f"**Giro {i + 1}**")
-            cg1, cg2, cg3 = st.columns([2, 4, 2])
-            with cg1:
-                cod_giro = st.text_input(
-                    f"Código giro {i + 1}",
-                    max_chars=50,
-                    key=f"codigo_giro_{i + 1}",
-                )
-            with cg2:
-                giro_desc = st.text_input(
-                    f"Descripción del giro {i + 1}",
+        actividades_generales = []
+        for i in range(n_actividades):
+            st.markdown(f"**Actividad general {i + 1}**")
+            col_act1, col_act2 = st.columns([3, 1])
+            with col_act1:
+                actividad_i = st.text_input(
+                    f"Actividad general {i + 1}*",
                     max_chars=200,
-                    key=f"desc_giro_{i + 1}",
+                    key=f"actividad_{i + 1}",
                 )
-            with cg3:
-                conf_giro = st.selectbox(
-                    f"Conformidad giro {i + 1}",
-                    ["SI", "NO"],
-                    key=f"conf_giro_{i + 1}",
+            with col_act2:
+                codigo_i = st.text_input(
+                    f"Código de la actividad {i + 1}*",
+                    max_chars=50,
+                    key=f"codigo_actividad_{i + 1}",
                 )
 
-            fila_conf_si = "X" if conf_giro == "SI" else ""
-            fila_conf_no = "X" if conf_giro == "NO" else ""
+            zona_sel_i = st.selectbox(
+                f"Zonificación (código) actividad {i + 1}*",
+                zona_opciones,
+                key=f"zona_sel_{i + 1}",
+            )
+            zona_codigo_i = zona_sel_i.split(" – ")[0]
+            zona_desc_i = ZONAS_DICT.get(zona_codigo_i, "")
 
-            actividades_tabla.append(
+            n_giros_i = st.number_input(
+                f"N° de giros para actividad {i + 1}*",
+                min_value=1,
+                max_value=10,
+                step=1,
+                key=f"n_giros_tabla_{i + 1}",
+            )
+            n_giros_i = int(n_giros_i)
+
+            giros_i = []
+            for j in range(n_giros_i):
+                st.markdown(f"Giro {j + 1} de actividad {i + 1}")
+                cg1, cg2, cg3 = st.columns([2, 4, 2])
+                with cg1:
+                    cod_giro = st.text_input(
+                        f"Código giro {i + 1}.{j + 1}",
+                        max_chars=50,
+                        key=f"codigo_giro_{i + 1}_{j + 1}",
+                    )
+                with cg2:
+                    giro_desc = st.text_input(
+                        f"Descripción del giro {i + 1}.{j + 1}",
+                        max_chars=200,
+                        key=f"desc_giro_{i + 1}_{j + 1}",
+                    )
+                with cg3:
+                    conf_giro = st.selectbox(
+                        f"Conformidad giro {i + 1}.{j + 1}",
+                        ["SI", "NO"],
+                        key=f"conf_giro_{i + 1}_{j + 1}",
+                    )
+
+                giros_i.append(
+                    {
+                        "codigo": cod_giro,
+                        "giro": giro_desc,
+                        "conf_si": "X" if conf_giro == "SI" else "",
+                        "conf_no": "X" if conf_giro == "NO" else "",
+                    }
+                )
+
+            actividades_generales.append(
                 {
-                    "codigo": cod_giro,
-                    "giro": to_upper(giro_desc),
-                    "conf_si": fila_conf_si,
-                    "conf_no": fila_conf_no,
+                    "actividad": actividad_i,
+                    "codigo": codigo_i,
+                    "zona": zona_codigo_i,
+                    "zona_desc": zona_desc_i,
+                    "giros": giros_i,
                 }
             )
+
+            if i < n_actividades - 1:
+                st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
         st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
@@ -453,9 +471,6 @@ def run_modulo_compatibilidad():
         "itse": itse,
         "certificador": certificador,
         "tipo_licencia": tipo_licencia,
-        "actividad": actividad,
-        "codigo": codigo,
-        "zona": zona_codigo,
         "ds": ds,
     }.items():
         if isinstance(val, str) and not val.strip():
@@ -467,6 +482,28 @@ def run_modulo_compatibilidad():
         faltantes.append("fecha_ds")
     if not fecha_doc:
         faltantes.append("fecha_doc")
+
+    # Validar actividades generales y sus giros
+    if not actividades_generales:
+        faltantes.append("actividades_generales")
+    else:
+        for idx, ag in enumerate(actividades_generales, start=1):
+            if not str(ag.get("actividad", "")).strip():
+                faltantes.append(f"actividad_{idx}")
+            if not str(ag.get("codigo", "")).strip():
+                faltantes.append(f"codigo_actividad_{idx}")
+            if not str(ag.get("zona", "")).strip():
+                faltantes.append(f"zona_{idx}")
+
+            giros_ag = ag.get("giros", []) or []
+            if not giros_ag:
+                faltantes.append(f"giros_actividad_{idx}")
+            else:
+                for jdx, fila in enumerate(giros_ag, start=1):
+                    if not str(fila.get("codigo", "")).strip():
+                        faltantes.append(f"codigo_giro_{idx}_{jdx}")
+                    if not str(fila.get("giro", "")).strip():
+                        faltantes.append(f"desc_giro_{idx}_{jdx}")
 
     if faltantes:
         st.error("Faltan campos obligatorios: " + ", ".join(faltantes))
@@ -488,6 +525,32 @@ def run_modulo_compatibilidad():
 
     ordenanza_texto = ", ".join(ordenanzas_sel)
 
+    actividades_generales_ctx = []
+    for ag in actividades_generales:
+        giros_ctx = []
+        for fila in ag.get("giros", []):
+            giros_ctx.append(
+                {
+                    "codigo": str(fila.get("codigo", "")).strip(),
+                    "giro": to_upper(fila.get("giro", "")),
+                    "conf_si": fila.get("conf_si", ""),
+                    "conf_no": fila.get("conf_no", ""),
+                }
+            )
+
+        actividades_generales_ctx.append(
+            {
+                "actividad": to_upper(ag.get("actividad", "")),
+                "codigo": str(ag.get("codigo", "")).strip(),
+                "zona": str(ag.get("zona", "")).strip(),
+                "zona_desc": to_upper(ag.get("zona_desc", "")),
+                "giros": giros_ctx,
+            }
+        )
+
+    # Compatibilidad retroactiva por si alguna plantilla aÃºn usa variables antiguas
+    primera_actividad = actividades_generales_ctx[0] if actividades_generales_ctx else {}
+
     # --------- Contexto para la plantilla ---------
     ctx = {
         "n_compa": n_compa,
@@ -504,18 +567,18 @@ def run_modulo_compatibilidad():
         "certificador": certificador,
         "tipo_licencia": tipo_licencia,
 
-        "actividad": to_upper(actividad),
-        "codigo": codigo,
+        "actividad": primera_actividad.get("actividad", ""),
+        "codigo": primera_actividad.get("codigo", ""),
 
-        "zonaona": zona_codigo,  # (si tu plantilla usa {{zona}} mejor usa la clave "zona")
-        "zona": zona_codigo,
-        "zona_desc": to_upper(zona_desc),
+        "zona": primera_actividad.get("zona", ""),
+        "zona_desc": primera_actividad.get("zona_desc", ""),
 
         "ds": ds,
         "fecha_ds": fecha_mes_abrev(fecha_ds),
         "fecha_actual": fmt_fecha_larga(fecha_doc),
 
-        "actividades_tabla": actividades_tabla,
+        "actividades_tabla": primera_actividad.get("giros", []),
+        "actividades_generales": actividades_generales_ctx,
     }
 
     # Elegir plantilla según tipo de licencia
@@ -524,7 +587,7 @@ def run_modulo_compatibilidad():
     else:
         tpl_path = TPL_COMP_TEMPORAL
 
-    base_name = f"{n_compa} - 2026 - {to_upper(persona)}"
+    base_name = f"{n_compa} - {fecha_doc.year} - {to_upper(persona)}"
     render_doc(ctx, base_name, tpl_path)
 
 
