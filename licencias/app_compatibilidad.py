@@ -176,8 +176,8 @@ def run_modulo_compatibilidad():
         .block-container {
             padding-top: 0.9rem;
             max-width: 980px;
-            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-            border-radius: 14px;
+            background: #f7f9fc;
+            border-radius: 12px;
             padding-left: 14px;
             padding-right: 14px;
             padding-bottom: 18px;
@@ -189,32 +189,61 @@ def run_modulo_compatibilidad():
             border: 1px solid #cbd5e1;
             background: #ffffff;
         }
+        .stButton>button:hover {
+            border-color: #94a3b8;
+            background: #f8fafc;
+        }
         .card {
-            border: 1px solid #dbe2ea;
+            border: 1px solid #d7dee8;
             border-radius: 16px;
             padding: 18px 20px;
             margin-bottom: 18px;
             background: #ffffff;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
         }
         .subcard {
-            border: 1px solid #e5e7eb;
+            border: 1px solid #dbeafe;
             border-radius: 12px;
             padding: 12px 14px 8px 14px;
-            background: #f8fafc;
+            background: #f8fbff;
             margin: 10px 0 12px 0;
         }
         .section-title {
             font-size: 0.92rem;
             text-transform: uppercase;
             letter-spacing: .08em;
-            color: #64748b;
+            color: #475569;
             margin-bottom: 0.45rem;
             font-weight: 700;
         }
         .section-divider {
             margin: 0.5rem 0 1rem 0;
             border-top: 1px solid #e2e8f0;
+        }
+        /* Mejor contraste en campos */
+        .stTextInput label, .stTextArea label, .stSelectbox label, .stMultiSelect label {
+            color: #334155 !important;
+            font-weight: 600;
+        }
+        .stTextInput input, .stTextArea textarea {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        .stTextInput input:focus, .stTextArea textarea:focus {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 1px #2563eb !important;
+        }
+        .stSelectbox [data-baseweb="select"] > div,
+        .stMultiSelect [data-baseweb="select"] > div {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        .stSelectbox [data-baseweb="select"] > div:focus-within,
+        .stMultiSelect [data-baseweb="select"] > div:focus-within {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 1px #2563eb !important;
         }
         </style>
         """,
