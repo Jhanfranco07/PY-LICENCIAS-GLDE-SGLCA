@@ -324,11 +324,10 @@ def run_modulo_compatibilidad():
             unsafe_allow_html=True,
         )
 
-        n_actividades = st.number_input(
+        n_actividades = st.selectbox(
             "N° de actividades generales*",
-            min_value=1,
-            max_value=5,
-            step=1,
+            options=[1, 2, 3, 4, 5],
+            index=0,
             key="n_actividades_compa",
         )
         n_actividades = int(n_actividades)
@@ -359,11 +358,10 @@ def run_modulo_compatibilidad():
             zona_codigo_i = zona_sel_i.split(" – ")[0]
             zona_desc_i = ZONAS_DICT.get(zona_codigo_i, "")
 
-            n_giros_i = st.number_input(
+            n_giros_i = st.selectbox(
                 f"N° de giros para actividad {i + 1}*",
-                min_value=1,
-                max_value=10,
-                step=1,
+                options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                index=0,
                 key=f"n_giros_tabla_{i + 1}",
             )
             n_giros_i = int(n_giros_i)
