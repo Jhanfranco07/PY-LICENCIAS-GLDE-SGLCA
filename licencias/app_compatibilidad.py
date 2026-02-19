@@ -173,30 +173,48 @@ def run_modulo_compatibilidad():
     st.markdown(
         """
         <style>
-        .block-container { padding-top: 1.0rem; max-width: 900px; }
+        .block-container {
+            padding-top: 0.9rem;
+            max-width: 980px;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            border-radius: 14px;
+            padding-left: 14px;
+            padding-right: 14px;
+            padding-bottom: 18px;
+        }
         .stButton>button {
             border-radius: 10px;
             padding: .55rem 1rem;
             font-weight: 600;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
         }
         .card {
-            border: 1px solid rgba(148, 163, 184, 0.35);
+            border: 1px solid #dbe2ea;
             border-radius: 16px;
             padding: 18px 20px;
             margin-bottom: 18px;
-            background: rgba(15, 23, 42, 0.35);
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        }
+        .subcard {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 14px 8px 14px;
+            background: #f8fafc;
+            margin: 10px 0 12px 0;
         }
         .section-title {
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             text-transform: uppercase;
             letter-spacing: .08em;
-            color: #9ca3af;
-            margin-bottom: 0.35rem;
-            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.45rem;
+            font-weight: 700;
         }
         .section-divider {
-            margin: 0.4rem 0 0.9rem 0;
-            border-top: 1px solid rgba(148, 163, 184, 0.35);
+            margin: 0.5rem 0 1rem 0;
+            border-top: 1px solid #e2e8f0;
         }
         </style>
         """,
@@ -222,7 +240,7 @@ def run_modulo_compatibilidad():
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
     # ---------- Formulario principal ----------
-    with st.form("form_compatibilidad"):
+    with st.container():
 
         # ---------------- Encabezado ----------------
         st.markdown(
@@ -254,16 +272,18 @@ def run_modulo_compatibilidad():
         # Botones: usan callback (NO rompe session_state)
         b1, b2 = st.columns(2)
         with b1:
-            st.form_submit_button(
+            st.button(
                 "⚡ Autocompletar solicitante con DNI",
                 use_container_width=True,
                 on_click=_autocompletar_con_dni,
+                key="btn_auto_dni_compa",
             )
         with b2:
-            st.form_submit_button(
+            st.button(
                 "⚡ Autocompletar solicitante con RUC",
                 use_container_width=True,
                 on_click=_autocompletar_con_ruc,
+                key="btn_auto_ruc_compa",
             )
 
         direccion = st.text_input("Dirección*", max_chars=200)
@@ -324,17 +344,20 @@ def run_modulo_compatibilidad():
             unsafe_allow_html=True,
         )
 
-        n_actividades = st.selectbox(
-            "N° de actividades generales*",
-            options=[1, 2, 3, 4, 5],
-            index=0,
-            key="n_actividades_compa",
-        )
+        sel_act_col, _ = st.columns([1, 2])
+        with sel_act_col:
+            n_actividades = st.selectbox(
+                "N° de actividades generales*",
+                options=[1, 2, 3, 4, 5],
+                index=0,
+                key="n_actividades_compa",
+            )
         n_actividades = int(n_actividades)
         zona_opciones = [f"{c} – {d}" for c, d in ZONAS]
 
         actividades_generales = []
         for i in range(n_actividades):
+            st.markdown('<div class="subcard">', unsafe_allow_html=True)
             st.markdown(f"**Actividad general {i + 1}**")
             col_act1, col_act2 = st.columns([3, 1])
             with col_act1:
@@ -358,12 +381,14 @@ def run_modulo_compatibilidad():
             zona_codigo_i = zona_sel_i.split(" – ")[0]
             zona_desc_i = ZONAS_DICT.get(zona_codigo_i, "")
 
-            n_giros_i = st.selectbox(
-                f"N° de giros para actividad {i + 1}*",
-                options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                index=0,
-                key=f"n_giros_tabla_{i + 1}",
-            )
+            sel_giro_col, _ = st.columns([1, 2])
+            with sel_giro_col:
+                n_giros_i = st.selectbox(
+                    f"N° de giros para actividad {i + 1}*",
+                    options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    index=0,
+                    key=f"n_giros_tabla_{i + 1}",
+                )
             n_giros_i = int(n_giros_i)
 
             giros_i = []
@@ -410,6 +435,7 @@ def run_modulo_compatibilidad():
 
             if i < n_actividades - 1:
                 st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
@@ -434,7 +460,7 @@ def run_modulo_compatibilidad():
         )
 
         st.markdown("")
-        generar = st.form_submit_button("🧾 Generar compatibilidad (.docx)")
+        generar = st.button("🧾 Generar compatibilidad (.docx)", key="btn_generar_compa")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
