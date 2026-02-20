@@ -8,7 +8,7 @@ from licencias.app_compatibilidad import run_modulo_compatibilidad
 
 
 SYSTEM_NAME = "Plataforma Integral de Tramites Municipales"
-SYSTEM_SUBTITLE = "GLDE - Gestion de Licencias, Documentos y Evaluaciones"
+SYSTEM_SUBTITLE = "SGLCA - Gestion de Licencias, Documentos y Evaluaciones"
 
 
 def _inject_main_styles() -> None:
