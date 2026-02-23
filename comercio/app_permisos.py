@@ -2,6 +2,7 @@
 
 import io
 import os
+import re
 import traceback
 
 import pandas as pd
@@ -130,6 +131,18 @@ def _doc_identidad_valido(val: str) -> bool:
     """
     doc = (val or "").strip()
     return doc.isdigit() and len(doc) in (8, 9)
+
+
+def _certificado_anterior_valido(val: str) -> bool:
+    """
+    Acepta:
+    - Solo numeros: 121
+    - Numero-anio:  187-2025
+    """
+    txt = (val or "").strip()
+    if not txt:
+        return True
+    return bool(re.fullmatch(r"\d+(?:-\d{4})?", txt))
 
 
 def _label_plazo(tiempo: int, unidad: str) -> str:
@@ -781,10 +794,12 @@ def run_permisos_comercio():
                 "N° de Certificado anterior (opcional)",
                 key="antiguo_certificado",
                 value=st.session_state.get("antiguo_certificado", ""),
-                placeholder="Ej: 121",
+                placeholder="Ej: 121 o 187-2025",
             )
-            if antiguo_certificado and not str(antiguo_certificado).isdigit():
-                st.error("El certificado anterior debe ser solo números (ej.: 121)")
+            if not _certificado_anterior_valido(antiguo_certificado):
+                st.error(
+                    "Formato invalido. Usa solo numeros (121) o numero-anio (187-2025)."
+                )
 
         c7 = st.columns(2)
         with c7[0]:
@@ -901,6 +916,10 @@ def run_permisos_comercio():
             elif not eva.get("horario"):
                 st.error(
                     "Falta **Horario** en Evaluación (o en Ediciones rápidas)."
+                )
+            elif not _certificado_anterior_valido(antiguo_certificado):
+                st.error(
+                    "Certificado anterior inválido. Usa 121 o 187-2025."
                 )
             elif falt:
                 st.error("Faltan campos de Resolución: " + ", ".join(falt))
@@ -1043,6 +1062,8 @@ def run_permisos_comercio():
                 falt_bd.append("Fecha del certificado")
             if not res_vig_ini_val or not res_vig_fin_val:
                 falt_bd.append("Vigencia (inicio/fin) en Resolución")
+            if not _certificado_anterior_valido(str(antiguo_cert or "")):
+                falt_bd.append("Certificado anterior (formato 121 o 187-2025)")
 
             if falt_bd:
                 st.error(
