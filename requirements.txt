@@ -1,0 +1,13 @@
+streamlit
+docxtpl
+pandas
+Unidecode
+python-docx
+jinja2
+openpyxl
+
+gspread
+google-auth
+google-auth-oauthlib
+
+requests

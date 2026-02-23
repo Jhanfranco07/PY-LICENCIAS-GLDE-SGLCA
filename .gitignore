@@ -1,0 +1,18 @@
+# Entorno virtual
+venv/
+.env/
+
+# Archivos generados
+salidas/
+__pycache__/
+*.pyc
+
+# Streamlit local
+.streamlit/
+# No subir credenciales
+credenciales/
+*.json
+
+secrets.toml
+
+~$*.docx
