@@ -90,6 +90,12 @@ def build_vigencia(fi, ff) -> str:
     return f"{ini} hasta el {fin}" if ini and fin else ""
 
 
+def build_vigencia_bd(fi, ff) -> str:
+    i = fmt_fecha_corta(fi)
+    f = fmt_fecha_corta(ff)
+    return f"{i} A {f}" if i and f else ""
+
+
 def build_vigencia2(fi, ff) -> str:
     i = fmt_fecha_corta(fi)
     f = fmt_fecha_corta(ff)
@@ -1072,7 +1078,7 @@ def run_permisos_comercio():
                 )
             else:
                 try:
-                    vigencia_txt = build_vigencia(
+                    vigencia_txt = build_vigencia_bd(
                         res_vig_ini_val, res_vig_fin_val
                     )
 
