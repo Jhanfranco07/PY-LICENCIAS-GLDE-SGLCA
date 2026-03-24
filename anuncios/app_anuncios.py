@@ -11,14 +11,14 @@ import streamlit as st
 from docxtpl import DocxTemplate
 from google.oauth2.service_account import Credentials
 
-from utils import fecha_larga, safe_filename_pretty  # funciÃ³n comÃºn en utils.py
+from utils import fecha_larga, safe_filename_pretty  # función común en utils.py
 
 #  CODART (SUNAT) para autocompletar
 from integraciones.codart import CodartAPIError, consultar_dni, consultar_ruc
 
 
 # ============================================================================
-# CONFIGURACIÃ“N GOOGLE SHEETS (USANDO STREAMLIT SECRETS)
+# CONFIGURACIÓN GOOGLE SHEETS (USANDO STREAMLIT SECRETS)
 # ============================================================================
 
 # ID de tu Google Sheets (lo sacas de la URL: .../spreadsheets/d/TU_ID/edit)
@@ -35,23 +35,23 @@ SCOPES = [
 # Columnas exactamente como en el formato oficial
 COLUMNAS_OFICIALES = [
     "EXP",
-    "NÂ° RECIBO",
-    "FECHA DE INGRESO",  # â¬…ï¸ nueva columna para el expediente
+    "N° RECIBO",
+    "FECHA DE INGRESO",  # nueva columna para el expediente
     "RUC DE LA EMPRESA",
-    "NÃšMERO DE AUTORIZACION ",
-    "FECHA DE EMISIÃ“N DE LA AUTORIZACION",
-    "FECHA DE EXPIRACIÃ“N DE LA AUTORIZACION",
+    "NÚMERO DE AUTORIZACION ",
+    "FECHA DE EMISIÓN DE LA AUTORIZACION",
+    "FECHA DE EXPIRACIÓN DE LA AUTORIZACION",
     "TIPO DE DOCUMENTO DE IDENTIDAD DEL SOLICITANTE",
-    "NÃšMERO DE DOCUMENTO DE IDENTIDAD DEL SOLICITANTE",
+    "NÚMERO DE DOCUMENTO DE IDENTIDAD DEL SOLICITANTE",
     "APELLIDO PATERNO DEL SOLICITANTE",
     "APELLIDO MATERNO DEL SOLICITANTE",
     "NOMBRE DEL SOLICITANTE",
-    "RAZÃ“N SOCIAL DEL SOLICITANTE",
+    "RAZÓN SOCIAL DEL SOLICITANTE",
     "CARACTERISTICA FISICA DEL PANEL",
     "CARACTERISTICA TECNICA DEL PANEL",
-    "TIPO DE ANUNCIPO PUBLICITARIO (MÃ³vil, paneles, banderolas, etc.)",
+    "TIPO DE ANUNCIPO PUBLICITARIO (Móvil, paneles, banderolas, etc.)",
     "DIRECCION",
-    "UBICACIÃ“N",
+    "UBICACIÓN",
     "LEYENDA",
     "LARGO",
     "ALTO",
@@ -60,7 +60,7 @@ COLUMNAS_OFICIALES = [
     "LONGUITUD DE SOPORTES",
     "COLOR",
     "MATERIAL",
-    "NÂ° CARAS",
+    "N° CARAS",
     "COORDENADAS",
 ]
 
@@ -73,7 +73,7 @@ COLUMNAS_OFICIALES = [
 def get_worksheet():
     """
     Crea el cliente de Google Sheets usando st.secrets y devuelve la hoja de trabajo.
-    Se cachea para no reautenticar en cada interacciÃ³n.
+    Se cachea para no reautenticar en cada interacción.
     """
     creds_info = st.secrets["gcp_service_account"]
     creds = Credentials.from_service_account_info(creds_info, scopes=SCOPES)
@@ -86,7 +86,7 @@ def get_worksheet():
         # Si no existe la hoja con ese nombre, usamos la primera
         ws = sh.sheet1
 
-    # Si la hoja estÃ¡ vacÃ­a, ponemos la fila de encabezados
+    # Si la hoja está vacía, ponemos la fila de encabezados
     values = ws.get_all_values()
     if not values:
         ws.update("A1", [COLUMNAS_OFICIALES])
@@ -97,7 +97,7 @@ def get_worksheet():
 def leer_bd_certificados() -> pd.DataFrame:
     """
     Lee toda la BD desde Google Sheets y la devuelve como DataFrame.
-    Si no hay datos, devuelve un DF vacÃ­o con las columnas oficiales.
+    Si no hay datos, devuelve un DF vacío con las columnas oficiales.
     """
     ws = get_worksheet()
     values = ws.get_all_values()
@@ -140,7 +140,7 @@ def escribir_bd_certificados(df: pd.DataFrame):
 
 
 # ============================================================================
-# Helpers para la BD (con la lÃ³gica de nombres / apellidos)
+# Helpers para la BD (con la lógica de nombres / apellidos)
 # ============================================================================
 
 def split_nombre_apellidos(nombre_raw: str):
@@ -149,7 +149,7 @@ def split_nombre_apellidos(nombre_raw: str):
     - apellido paterno
     - apellido materno
     - nombres
-    usando una heurÃ­stica simple basada en espacios.
+    usando una heurística simple basada en espacios.
     """
     if not nombre_raw:
         return "", "", ""
@@ -192,23 +192,23 @@ def guardar_certificado_en_bd(
 
     ape_pat, ape_mat, nombres = split_nombre_apellidos(nombre_persona)
 
-    # RazÃ³n social = campo {{nombre}} (para RUC 20 serÃ¡ la empresa)
+    # Razón social = campo {{nombre}} (para RUC 20 será la empresa)
     razon_social = str(eval_ctx.get("nombre", "")).strip().upper()
 
     # Fechas en formato corto
     fecha_emision_str = fecha_cert.strftime("%d/%m/%Y") if fecha_cert else ""
 
-    # FECHA DE EXPIRACIÃ“N = texto de {{vigencia}}
+    # FECHA DE EXPIRACIÓN = texto de {{vigencia}}
     fecha_expiracion_str = vigencia_txt
 
-    # Fecha de ingreso del expediente (viene del contexto de evaluaciÃ³n)
+    # Fecha de ingreso del expediente (viene del contexto de evaluación)
     fecha_ingreso_val = eval_ctx.get("fecha_ingreso", "")
     if hasattr(fecha_ingreso_val, "strftime"):
         fecha_ingreso_str = fecha_ingreso_val.strftime("%d/%m/%Y")
     else:
         fecha_ingreso_str = str(fecha_ingreso_val or "").strip()
 
-    # Campos comunes desde la evaluaciÃ³n
+    # Campos comunes desde la evaluación
     num_ds_val = str(eval_ctx.get("num_ds", "")).strip()
     ruc_empresa = str(eval_ctx.get("ruc", "")).strip()
     direccion = str(eval_ctx.get("direccion", "")).strip().upper()
@@ -226,23 +226,23 @@ def guardar_certificado_en_bd(
 
     nueva_fila = {
         "EXP": num_ds_val,
-        "NÂ° RECIBO": num_recibo,
-        "FECHA DE INGRESO": fecha_ingreso_str,  # â¬…ï¸ ahora se guarda en la BD
+        "N° RECIBO": num_recibo,
+        "FECHA DE INGRESO": fecha_ingreso_str,  # ahora se guarda en la BD
         "RUC DE LA EMPRESA": ruc_empresa,
-        "NÃšMERO DE AUTORIZACION ": n_certificado,
-        "FECHA DE EMISIÃ“N DE LA AUTORIZACION": fecha_emision_str,
-        "FECHA DE EXPIRACIÃ“N DE LA AUTORIZACION": fecha_expiracion_str,
+        "NÚMERO DE AUTORIZACION ": n_certificado,
+        "FECHA DE EMISIÓN DE LA AUTORIZACION": fecha_emision_str,
+        "FECHA DE EXPIRACIÓN DE LA AUTORIZACION": fecha_expiracion_str,
         "TIPO DE DOCUMENTO DE IDENTIDAD DEL SOLICITANTE": doc_tipo,
-        "NÃšMERO DE DOCUMENTO DE IDENTIDAD DEL SOLICITANTE": doc_num,
+        "NÚMERO DE DOCUMENTO DE IDENTIDAD DEL SOLICITANTE": doc_num,
         "APELLIDO PATERNO DEL SOLICITANTE": ape_pat,
         "APELLIDO MATERNO DEL SOLICITANTE": ape_mat,
         "NOMBRE DEL SOLICITANTE": nombres,
-        "RAZÃ“N SOCIAL DEL SOLICITANTE": razon_social,
+        "RAZÓN SOCIAL DEL SOLICITANTE": razon_social,
         "CARACTERISTICA FISICA DEL PANEL": fisico,
         "CARACTERISTICA TECNICA DEL PANEL": tecnico,
-        "TIPO DE ANUNCIPO PUBLICITARIO (MÃ³vil, paneles, banderolas, etc.)": tipo_anuncio,
+        "TIPO DE ANUNCIPO PUBLICITARIO (Móvil, paneles, banderolas, etc.)": tipo_anuncio,
         "DIRECCION": direccion,
-        "UBICACIÃ“N": ubicacion,
+        "UBICACIÓN": ubicacion,
         "LEYENDA": leyenda,
         "LARGO": largo,
         "ALTO": alto,
@@ -251,7 +251,7 @@ def guardar_certificado_en_bd(
         "LONGUITUD DE SOPORTES": altura_soporte,
         "COLOR": color,
         "MATERIAL": material,
-        "NÂ° CARAS": num_caras,
+        "N° CARAS": num_caras,
         "COORDENADAS": coordenadas,
     }
 
@@ -266,11 +266,11 @@ def guardar_certificado_en_bd(
 
 
 # ============================================================================
-# âœ… AUTOCOMPLETE (SUNAT) + STATE
+# AUTOCOMPLETE (SUNAT) + STATE
 # ============================================================================
 
 def _init_anuncios_state():
-    st.session_state.setdefault("tipo_ruc_radio", "RUC 10 â€“ Persona natural")
+    st.session_state.setdefault("tipo_ruc_radio", "RUC 10 – Persona natural")
     st.session_state.setdefault("nombre_sol", "")
     st.session_state.setdefault("ruc_sol", "")
     st.session_state.setdefault("representante_sol", "")
@@ -280,7 +280,7 @@ def _init_anuncios_state():
 
 
 def _extract_razon_social(res: dict) -> str:
-    # Si viene anidado en "result", Ãºsalo
+    # Si viene anidado en "result", úsalo
     data = res.get("result") if isinstance(res, dict) else None
     if not isinstance(data, dict):
         data = res if isinstance(res, dict) else {}
@@ -304,7 +304,7 @@ def _cb_autocomplete_ruc():
         return
 
     if not (ruc.isdigit() and len(ruc) == 11):
-        st.session_state["anuncio_lookup_msg"] = "âš ï¸ RUC invÃ¡lido (debe tener 11 dÃ­gitos)."
+        st.session_state["anuncio_lookup_msg"] = "⚠️ RUC inválido (debe tener 11 dígitos)."
         return
 
     try:
@@ -313,24 +313,24 @@ def _cb_autocomplete_ruc():
 
         if razon:
             st.session_state["nombre_sol"] = razon
-            # mensaje â€œbonitoâ€
+            # mensaje simple de confirmación
             if ruc.startswith("10"):
-                st.session_state["anuncio_lookup_msg"] = "âœ… RUC 10 OK: nombre autocompletado."
+                st.session_state["anuncio_lookup_msg"] = "✅ RUC 10 OK: nombre autocompletado."
             elif ruc.startswith("20"):
-                st.session_state["anuncio_lookup_msg"] = "âœ… RUC 20 OK: razÃ³n social autocompletada."
+                st.session_state["anuncio_lookup_msg"] = "✅ RUC 20 OK: razón social autocompletada."
             else:
-                st.session_state["anuncio_lookup_msg"] = "âœ… RUC OK: solicitante autocompletado."
+                st.session_state["anuncio_lookup_msg"] = "✅ RUC OK: solicitante autocompletado."
         else:
-            st.session_state["anuncio_lookup_msg"] = "âš ï¸ RUC OK, pero no vino razÃ³n social/nombre."
+            st.session_state["anuncio_lookup_msg"] = "⚠️ RUC OK, pero no vino razón social/nombre."
 
     except (ValueError, CodartAPIError) as e:
-        st.session_state["anuncio_lookup_msg"] = f"âš ï¸ {e}"
+        st.session_state["anuncio_lookup_msg"] = f"⚠️ {e}"
     except Exception as e:
-        st.session_state["anuncio_lookup_msg"] = f"âš ï¸ Error inesperado consultando RUC: {e}"
+        st.session_state["anuncio_lookup_msg"] = f"⚠️ Error inesperado consultando RUC: {e}"
 
 
 # ============================================================================
-# MÃ³dulo principal (Streamlit)
+# Módulo principal (Streamlit)
 # ============================================================================
 
 def run_modulo_anuncios():
@@ -374,7 +374,7 @@ def run_modulo_anuncios():
 
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    # ========= Rutas de plantillas (carpeta en la RAÃZ del proyecto) =========
+    # ========= Rutas de plantillas (carpeta en la RAÍZ del proyecto) =========
     TEMPLATES_EVAL = {
         "PANEL SIMPLE - AZOTEAS": "plantillas_publicidad/evaluacion_panel_simple_azotea.docx",
         "LETRAS RECORTADAS": "plantillas_publicidad/evaluacion_letras_recortadas.docx",
@@ -391,7 +391,7 @@ def run_modulo_anuncios():
         "PANEL SENCILLO Y LUMINOSO": "plantillas_publicidad/certificado_panel_sencillo_luminoso.docx",
     }
 
-    # -------------------- SelecciÃ³n de tipo de anuncio --------------------
+    # -------------------- Selección de tipo de anuncio --------------------
     st.markdown(
         '<div class="section-title">Tipo de anuncio publicitario</div>',
         unsafe_allow_html=True,
@@ -404,7 +404,7 @@ def run_modulo_anuncios():
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
     # ------------------------------------------------------------------ #
-    # âœ… DATOS DEL SOLICITANTE (FUERA DEL FORM PARA SER DINÃMICO)        #
+    # DATOS DEL SOLICITANTE (FUERA DEL FORM PARA SER DINÁMICO)           #
     # ------------------------------------------------------------------ #
     st.markdown(
         '<div class="section-title">Datos del solicitante</div>',
@@ -429,7 +429,7 @@ def run_modulo_anuncios():
             key="nombre_sol",
         )
 
-        # âœ… Ahora sÃ­ aparece inmediatamente al cambiar a RUC 20
+        # Ahora sí aparece inmediatamente al cambiar a RUC 20
         if es_ruc20:
             representante = st.text_input(
                 "Representante legal (solo RUC 20)",
@@ -457,13 +457,13 @@ def run_modulo_anuncios():
             "RUC",
             max_chars=11,
             key="ruc_sol",
-            on_change=_cb_autocomplete_ruc,  # âœ… autocomplete SUNAT
+            on_change=_cb_autocomplete_ruc,  # autocomplete SUNAT
             placeholder="Digita el ruc",
         )
 
     msg = (st.session_state.get("anuncio_lookup_msg") or "").strip()
     if msg:
-        if msg.startswith("âœ…"):
+        if msg.startswith("✅"):
             st.success(msg)
         else:
             st.warning(msg)
@@ -471,7 +471,7 @@ def run_modulo_anuncios():
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
     # ------------------------------------------------------------------ #
-    #                         MÃ“DULO 1 Â· EVALUACIÃ“N                      #
+    #                         MÓDULO 1 · EVALUACIÓN                      #
     # ------------------------------------------------------------------ #
     with st.form("form_evaluacion"):
 
@@ -568,7 +568,7 @@ def run_modulo_anuncios():
         st.markdown("")
         generar_eval = st.form_submit_button("📝 Generar evaluación (.docx)")
 
-    # ---------- GENERACIÃ“N DEL WORD (EVALUACIÃ“N) ----------
+    # ---------- GENERACIÓN DEL WORD (EVALUACIÓN) ----------
     if generar_eval:
         # refrescamos valores desde session_state (por seguridad)
         tipo_ruc_label = st.session_state.get("tipo_ruc_radio", "RUC 10 – Persona natural")
@@ -612,7 +612,7 @@ def run_modulo_anuncios():
                 # Extra para registro / BD
                 "tipo_ruc": tipo_ruc,
                 "tipo_ruc_label": tipo_ruc_label,
-                "representante": representante,  # âœ… se guarda para BD cuando sea RUC 20
+                "representante": representante,  # se guarda para BD cuando sea RUC 20
             }
 
             st.session_state["anuncio_eval_ctx"] = contexto_eval
@@ -648,7 +648,7 @@ def run_modulo_anuncios():
                 st.error(f"Ocurrió un error al generar el documento de evaluación: {e}")
 
     # ------------------------------------------------------------------ #
-    #                        MÃ“DULO 2 Â· CERTIFICADO                      #
+    #                        MÓDULO 2 · CERTIFICADO                      #
     # ------------------------------------------------------------------ #
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
     st.markdown(
@@ -740,7 +740,7 @@ def run_modulo_anuncios():
         doc_num = ""
         num_recibo = ""
 
-    # ---------- GENERACIÃ“N DEL WORD (CERTIFICADO) ----------
+    # ---------- GENERACIÓN DEL WORD (CERTIFICADO) ----------
     if generar_cert and eval_ctx:
         if not n_certificado:
             st.error("Completa el N° de certificado.")
@@ -817,7 +817,7 @@ def run_modulo_anuncios():
                         ),
                     )
 
-                    # Guardamos en sesiÃ³n para luego registrar en BD
+                    # Guardamos en sesión para luego registrar en BD
                     st.session_state["anuncio_ultimo_cert_eval"] = eval_ctx
                     st.session_state["anuncio_ultimo_cert_meta"] = {
                         "vigencia_txt": vigencia_txt,
@@ -839,7 +839,7 @@ def run_modulo_anuncios():
                     st.error(f"Ocurrió un error al generar el certificado: {e}")
 
     # ------------------------------------------------------------------ #
-    #      OPCIÃ“N PARA GUARDAR EL ÃšLTIMO CERTIFICADO EN LA BD (SHEETS)   #
+    #      OPCIÓN PARA GUARDAR EL ÚLTIMO CERTIFICADO EN LA BD (SHEETS)   #
     # ------------------------------------------------------------------ #
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
     st.markdown(
