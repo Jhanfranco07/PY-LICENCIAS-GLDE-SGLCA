@@ -334,7 +334,7 @@ def _cb_autocomplete_ruc():
 # ============================================================================
 
 def run_modulo_anuncios():
-    st.header("ðŸ“¢ Anuncios Publicitarios â€“ EvaluaciÃ³n y Certificado")
+    st.header("📢 Anuncios Publicitarios – Evaluación y Certificado")
 
     _init_anuncios_state()
 
@@ -413,7 +413,7 @@ def run_modulo_anuncios():
 
     tipo_ruc_label = st.radio(
         "Tipo de contribuyente",
-        ["RUC 10 â€“ Persona natural", "RUC 20 â€“ Persona jurÃ­dica"],
+        ["RUC 10 – Persona natural", "RUC 20 – Persona jurídica"],
         index=0 if st.session_state["tipo_ruc_radio"].startswith("RUC 10") else 1,
         horizontal=True,
         key="tipo_ruc_radio",
@@ -424,7 +424,7 @@ def run_modulo_anuncios():
     col1, col2 = st.columns(2)
     with col1:
         nombre = st.text_input(
-            "Solicitante (nombre completo o razÃ³n social)",
+            "Solicitante (nombre completo o razón social)",
             max_chars=150,
             key="nombre_sol",
         )
@@ -441,7 +441,7 @@ def run_modulo_anuncios():
             representante = ""
 
         direccion = st.text_input(
-            "DirecciÃ³n del solicitante",
+            "Dirección del solicitante",
             max_chars=200,
             key="direccion_sol",
         )
@@ -476,7 +476,7 @@ def run_modulo_anuncios():
     with st.form("form_evaluacion"):
 
         st.markdown(
-            '<div class="section-title">EvaluaciÃ³n del anuncio</div>',
+            '<div class="section-title">Evaluación del anuncio</div>',
             unsafe_allow_html=True,
         )
 
@@ -517,7 +517,7 @@ def run_modulo_anuncios():
                 "Altura (m)", min_value=0.0, step=0.10, format="%.2f", key="altura_an"
             )
 
-        num_cara = st.number_input("NÂ° de caras", min_value=1, step=1, key="caras_an")
+        num_cara = st.number_input("N° de caras", min_value=1, step=1, key="caras_an")
 
         leyenda = st.text_area("Leyenda del anuncio", height=80, key="leyenda_an")
 
@@ -529,12 +529,12 @@ def run_modulo_anuncios():
 
         col_fisico, col_tecnico = st.columns(2)
         with col_fisico:
-            fisico = st.selectbox("CaracterÃ­sticas FÃSICAS", ["TOLDO", "PANEL SIMPLE", "LETRAS RECORTADAS", "BANDEROLA"], key="fisico_an")
+            fisico = st.selectbox("Características FÍSICAS", ["TOLDO", "PANEL SIMPLE", "LETRAS RECORTADAS", "BANDEROLA"], key="fisico_an")
         with col_tecnico:
-            tecnico = st.selectbox("CaracterÃ­sticas TÃ‰CNICAS", ["SENCILLO", "LUMINOSO", "ILUMINADO"], key="tecnico_an")
+            tecnico = st.selectbox("Características TÉCNICAS", ["SENCILLO", "LUMINOSO", "ILUMINADO"], key="tecnico_an")
 
         ubicacion = st.text_input(
-            "UbicaciÃ³n del anuncio", max_chars=200, key="ubicacion_an"
+            "Ubicación del anuncio", max_chars=200, key="ubicacion_an"
         )
 
         st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
@@ -546,9 +546,9 @@ def run_modulo_anuncios():
         )
         col6, col7, col8 = st.columns(3)
         with col6:
-            n_anuncio = st.text_input("NÂ° de anuncio (ej. 001)", key="n_anuncio")
+            n_anuncio = st.text_input("N° de anuncio (ej. 001)", key="n_anuncio")
         with col7:
-            num_ds = st.text_input("NÂ° de expediente / DS (ej. 1234)", key="num_ds")
+            num_ds = st.text_input("N° de expediente / DS (ej. 1234)", key="num_ds")
         with col8:
             fecha_ingreso = st.date_input("Fecha de ingreso", value=date.today())
 
@@ -557,7 +557,7 @@ def run_modulo_anuncios():
             fecha = st.date_input("Fecha del informe", value=date.today())
         with col10:
             anio = st.number_input(
-                "AÃ±o (para el encabezado y expediente)",
+                "Año (para el encabezado y expediente)",
                 min_value=2020,
                 max_value=2100,
                 value=date.today().year,
@@ -566,12 +566,12 @@ def run_modulo_anuncios():
             )
 
         st.markdown("")
-        generar_eval = st.form_submit_button("ðŸ“ Generar evaluaciÃ³n (.docx)")
+        generar_eval = st.form_submit_button("📝 Generar evaluación (.docx)")
 
     # ---------- GENERACIÃ“N DEL WORD (EVALUACIÃ“N) ----------
     if generar_eval:
         # refrescamos valores desde session_state (por seguridad)
-        tipo_ruc_label = st.session_state.get("tipo_ruc_radio", "RUC 10 â€“ Persona natural")
+        tipo_ruc_label = st.session_state.get("tipo_ruc_radio", "RUC 10 – Persona natural")
         es_ruc20 = tipo_ruc_label.startswith("RUC 20")
         tipo_ruc = "20" if es_ruc20 else "10"
 
@@ -582,7 +582,7 @@ def run_modulo_anuncios():
         representante = (st.session_state.get("representante_sol") or "").strip() if es_ruc20 else ""
 
         if not nombre or not n_anuncio or not num_ds:
-            st.error("Completa al menos: Solicitante, NÂ° de anuncio y NÂ° de expediente.")
+            st.error("Completa al menos: Solicitante, N° de anuncio y N° de expediente.")
         else:
             template_path = TEMPLATES_EVAL[tipo_anuncio]
             st.info(f"Usando plantilla: {template_path}")
@@ -628,9 +628,9 @@ def run_modulo_anuncios():
                 base_name = f"EA {n_anuncio}_exp{num_ds}_{nombre.lower()}"
                 nombre_archivo = safe_filename_pretty(base_name) + ".docx"
 
-                st.success("EvaluaciÃ³n generada correctamente.")
+                st.success("Evaluación generada correctamente.")
                 st.download_button(
-                    label="â¬‡ï¸ Descargar evaluaciÃ³n en Word",
+                    label="⬇️ Descargar evaluación en Word",
                     data=buffer,
                     file_name=nombre_archivo,
                     mime=(
@@ -640,12 +640,12 @@ def run_modulo_anuncios():
                 )
 
             except jinja2.TemplateSyntaxError as e:
-                st.error("Hay un error de sintaxis en la plantilla de EVALUACIÃ“N.")
+                st.error("Hay un error de sintaxis en la plantilla de EVALUACIÓN.")
                 st.error(f"Plantilla: {template_path}")
                 st.error(f"Mensaje: {e.message}")
-                st.error(f"LÃ­nea aproximada en el XML: {e.lineno}")
+                st.error(f"Línea aproximada en el XML: {e.lineno}")
             except Exception as e:
-                st.error(f"OcurriÃ³ un error al generar el documento de evaluaciÃ³n: {e}")
+                st.error(f"Ocurrió un error al generar el documento de evaluación: {e}")
 
     # ------------------------------------------------------------------ #
     #                        MÃ“DULO 2 Â· CERTIFICADO                      #
@@ -659,22 +659,22 @@ def run_modulo_anuncios():
     eval_ctx = st.session_state.get("anuncio_eval_ctx")
 
     if eval_ctx:
-        with st.expander("Ver datos reutilizados de la EvaluaciÃ³n"):
+        with st.expander("Ver datos reutilizados de la Evaluación"):
             st.write(
                 {
-                    "NÂ° anuncio": eval_ctx.get("n_anuncio"),
+                    "N° anuncio": eval_ctx.get("n_anuncio"),
                     "Expediente / DS": eval_ctx.get("num_ds"),
-                    "Nombre / RazÃ³n social": eval_ctx.get("nombre"),
+                    "Nombre / Razón social": eval_ctx.get("nombre"),
                     "Tipo de RUC": eval_ctx.get("tipo_ruc_label"),
                     "Representante (si RUC 20)": eval_ctx.get("representante"),
-                    "DirecciÃ³n": eval_ctx.get("direccion"),
+                    "Dirección": eval_ctx.get("direccion"),
                     "Coordenadas": eval_ctx.get("coordenadas"),
-                    "UbicaciÃ³n": eval_ctx.get("ubicacion"),
+                    "Ubicación": eval_ctx.get("ubicacion"),
                     "Dimensiones": f"{eval_ctx.get('largo')} x {eval_ctx.get('alto')}",
                     "Grosor": eval_ctx.get("grosor"),
                     "Altura (soporte)": eval_ctx.get("altura"),
-                    "CaracterÃƒÂ­sticas fÃƒÂ­sicas": eval_ctx.get("fisico"),
-                    "CaracterÃƒÂ­sticas tÃƒÂ©cnicas": eval_ctx.get("tecnico"),
+                    "Características físicas": eval_ctx.get("fisico"),
+                    "Características técnicas": eval_ctx.get("tecnico"),
                     "Material": eval_ctx.get("material"),
                 }
             )
@@ -682,7 +682,7 @@ def run_modulo_anuncios():
         with st.form("form_certificado"):
             colc1, colc2 = st.columns(2)
             with colc1:
-                n_certificado = st.text_input("NÂ° de certificado", max_chars=20)
+                n_certificado = st.text_input("N° de certificado", max_chars=20)
             with colc2:
                 fecha_cert = st.date_input("Fecha del certificado", value=date.today())
 
@@ -716,20 +716,20 @@ def run_modulo_anuncios():
                 )
             with col_doc2:
                 doc_num = st.text_input(
-                    "NÂ° documento del solicitante",
+                    "N° documento del solicitante",
                     max_chars=9,
                     key="doc_num",
                 )
             with col_rec:
                 num_recibo = st.text_input(
-                    "NÂ° de recibo (solo BD, opcional)",
+                    "N° de recibo (solo BD, opcional)",
                     max_chars=30,
                     key="num_recibo",
                 )
 
-            generar_cert = st.form_submit_button("ðŸ“œ Generar certificado (.docx)")
+            generar_cert = st.form_submit_button("📜 Generar certificado (.docx)")
     else:
-        st.info("Primero genera la **EvaluaciÃ³n** para poder armar el certificado.")
+        st.info("Primero genera la **Evaluación** para poder armar el certificado.")
         generar_cert = False
         n_certificado = ""
         fecha_cert = None
@@ -743,26 +743,26 @@ def run_modulo_anuncios():
     # ---------- GENERACIÃ“N DEL WORD (CERTIFICADO) ----------
     if generar_cert and eval_ctx:
         if not n_certificado:
-            st.error("Completa el NÂ° de certificado.")
+            st.error("Completa el N° de certificado.")
         else:
             doc_tipo_norm = (doc_tipo or "").strip().upper()
             doc_num_clean = (doc_num or "").strip()
             if doc_num_clean:
                 if doc_tipo_norm == "DNI":
                     if not (doc_num_clean.isdigit() and len(doc_num_clean) == 8):
-                        st.error("DNI invÃ¡lido: debe tener 8 dÃ­gitos.")
+                        st.error("DNI inválido: debe tener 8 dígitos.")
                         return
                     try:
                         consultar_dni(doc_num_clean)
                     except (ValueError, CodartAPIError) as e:
-                        st.error(f"DNI invÃ¡lido o no consultable en CODART: {e}")
+                        st.error(f"DNI inválido o no consultable en CODART: {e}")
                         return
                     except Exception as e:
                         st.error(f"Error validando DNI con CODART: {e}")
                         return
                 else:
                     if not (doc_num_clean.isdigit() and len(doc_num_clean) == 9):
-                        st.error("C.E invÃ¡lido: debe tener 9 dÃ­gitos.")
+                        st.error("C.E inválido: debe tener 9 dígitos.")
                         return
 
             if vigencia_tipo == "TEMPORAL":
@@ -772,7 +772,7 @@ def run_modulo_anuncios():
 
             cert_template_path = TEMPLATES_CERT.get(tipo_anuncio)
             if not cert_template_path:
-                st.error("No se encontrÃ³ plantilla de certificado para este tipo de anuncio.")
+                st.error("No se encontró plantilla de certificado para este tipo de anuncio.")
             else:
                 contexto_cert = {
                     "n_certificado": n_certificado,
@@ -808,7 +808,7 @@ def run_modulo_anuncios():
 
                     st.success("Certificado generado correctamente.")
                     st.download_button(
-                        label="â¬‡ï¸ Descargar certificado en Word",
+                        label="⬇️ Descargar certificado en Word",
                         data=buffer,
                         file_name=nombre_archivo_cert,
                         mime=(
@@ -834,16 +834,16 @@ def run_modulo_anuncios():
                     st.error("Hay un error de sintaxis en la plantilla de CERTIFICADO.")
                     st.error(f"Plantilla: {cert_template_path}")
                     st.error(f"Mensaje: {e.message}")
-                    st.error(f"LÃ­nea aproximada en el XML: {e.lineno}")
+                    st.error(f"Línea aproximada en el XML: {e.lineno}")
                 except Exception as e:
-                    st.error(f"OcurriÃ³ un error al generar el certificado: {e}")
+                    st.error(f"Ocurrió un error al generar el certificado: {e}")
 
     # ------------------------------------------------------------------ #
     #      OPCIÃ“N PARA GUARDAR EL ÃšLTIMO CERTIFICADO EN LA BD (SHEETS)   #
     # ------------------------------------------------------------------ #
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
     st.markdown(
-        '<div class="section-title">Registrar Ãºltimo certificado en BD (Google Sheets)</div>',
+        '<div class="section-title">Registrar último certificado en BD (Google Sheets)</div>',
         unsafe_allow_html=True,
     )
 
@@ -852,11 +852,11 @@ def run_modulo_anuncios():
 
     if not ult_eval or not ult_meta:
         st.info(
-            "TodavÃ­a no hay un certificado reciente para registrar en la BD. "
-            "Genera un certificado y luego podrÃ¡s guardarlo aquÃ­."
+            "Todavía no hay un certificado reciente para registrar en la BD. "
+            "Genera un certificado y luego podrás guardarlo aquí."
         )
     else:
-        if st.button("ðŸ’¾ Guardar Ãºltimo certificado en BD (Google Sheets)"):
+        if st.button("💾 Guardar último certificado en BD (Google Sheets)"):
             try:
                 guardar_certificado_en_bd(
                     ult_eval,
@@ -871,7 +871,7 @@ def run_modulo_anuncios():
                 )
                 st.success("Certificado registrado en la base de datos (Google Sheets).")
             except Exception as e:
-                st.error(f"OcurriÃ³ un error al guardar en Google Sheets: {e}")
+                st.error(f"Ocurrió un error al guardar en Google Sheets: {e}")
 
     # ------------------------------------------------------------------ #
     #     VER / EDITAR / DESCARGAR BD DESDE GOOGLE SHEETS                #
@@ -898,10 +898,10 @@ def run_modulo_anuncios():
             )
             st.caption(
                 "Puedes editar celdas o agregar / eliminar filas. "
-                "Luego guarda los cambios en la hoja de cÃ¡lculo."
+                "Luego guarda los cambios en la hoja de cálculo."
             )
 
-            if st.button("ðŸ’¾ Guardar cambios en BD (Google Sheets)"):
+            if st.button("💾 Guardar cambios en BD (Google Sheets)"):
                 try:
                     escribir_bd_certificados(edited_df)
                     st.success("Cambios guardados correctamente en Google Sheets.")
@@ -916,7 +916,7 @@ def run_modulo_anuncios():
         buffer.seek(0)
 
         st.download_button(
-            "â¬‡ï¸ Descargar BD como Excel",
+            "⬇️ Descargar BD como Excel",
             data=buffer,
             file_name="BD_CERTIFICADOS_ANUNCIO.xlsx",
             mime=(
@@ -926,8 +926,8 @@ def run_modulo_anuncios():
         )
     else:
         st.info(
-            "AÃºn no hay registros en la base de datos de Google Sheets. "
-            "Cuando guardes un certificado, se empezarÃ¡ a llenar."
+            "Aún no hay registros en la base de datos de Google Sheets. "
+            "Cuando guardes un certificado, se empezará a llenar."
         )
 
     st.markdown("</div>", unsafe_allow_html=True)
